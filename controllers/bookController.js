@@ -1,7 +1,24 @@
-var Book = require('../models/book');
+let Book = require('../models/book');
+let Author = require('../models/author');
+let Genre = require('../models/genre');
+let BookInstance = require('../models/bookinstance');
 
-index = function(req, res) {
-    res.send('NOT IMPLEMENTED: Site Home Page');
+index = function(req, res, next) {
+    let bookCount = Book.countDocuments({});
+    let authorCount = Author.countDocuments({});
+    let genreCount = Genre.countDocuments({});
+    let bookInstanceCount = BookInstance.countDocuments({});
+    let bookInstanceAvailableCount = BookInstance.countDocuments({status: "Available"});
+
+    let counts = Promise.all([bookCount, authorCount, genreCount, bookInstanceCount, bookInstanceAvailableCount]);
+    counts
+        .then(results => {
+            res.render('index', {title: 'Local Library Home', data: results});
+        })
+        .catch(err => {
+            console.error(err);
+            res.send('There was an error');
+        });
 };
 
 // Display list of all books.
