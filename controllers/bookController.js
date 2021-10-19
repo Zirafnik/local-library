@@ -3,7 +3,7 @@ let Author = require('../models/author');
 let Genre = require('../models/genre');
 let BookInstance = require('../models/bookinstance');
 
-index = function(req, res, next) {
+let index = function(req, res, next) {
     let bookCount = Book.countDocuments({});
     let authorCount = Author.countDocuments({});
     let genreCount = Genre.countDocuments({});
@@ -16,8 +16,8 @@ index = function(req, res, next) {
             res.render('index', {title: 'Local Library Home', data: results});
         })
         .catch(err => {
-            console.error(err);
-            res.send('There was an error');
+            console.error('This is the error: ' + err);
+            res.render('error');
         });
 };
 
