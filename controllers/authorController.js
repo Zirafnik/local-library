@@ -1,7 +1,7 @@
 let Author = require('../models/author');
 
 // Display list of all Authors.
-author_list = function(req, res) {
+let author_list = function(req, res, next) {
     Author.find()
     .sort({family_name: 'asc'})
     .then(list => {
