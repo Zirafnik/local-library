@@ -22,8 +22,11 @@ let index = function(req, res, next) {
 };
 
 // Display list of all books.
-book_list = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book list');
+let book_list = function(req, res) {
+    Book.find({}, 'title author', {sort: {title: 1}})
+        .populate('author')
+        .then(list => res.render('book_list', {title: 'Book List', book_list: list}))
+        .catch(err => next(err));
 };
 
 // Display detail page for a specific book.
