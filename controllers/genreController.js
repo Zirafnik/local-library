@@ -1,8 +1,14 @@
-var Genre = require('../models/genre');
+const { NotExtended } = require('http-errors');
+let Genre = require('../models/genre');
 
 // Display list of all Genre.
-genre_list = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre list');
+let genre_list = function(req, res, next) {
+    Genre.find()
+    .sort({name: 'asc'})
+    .then(list => {
+        res.render('genre_list', {title: 'Genre List', genre_list: list});
+    })
+    .catch(err => next(err));
 };
 
 // Display detail page for a specific Genre.
