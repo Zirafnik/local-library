@@ -22,7 +22,7 @@ let index = function(req, res, next) {
 };
 
 // Display list of all books.
-let book_list = function(req, res) {
+let book_list = function(req, res, next) {
     Book.find({}, 'title author', {sort: {title: 1}})
         .populate('author')
         .then(list => res.render('book_list', {title: 'Book List', book_list: list}))
@@ -30,38 +30,51 @@ let book_list = function(req, res) {
 };
 
 // Display detail page for a specific book.
-book_detail = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book detail: ' + req.params.id);
+let book_detail = async function(req, res, next) {
+    try{
+        let bookPromise = Book.findById(req.params.id)
+        .populate('author')
+        .populate('genre')
+
+        let bookInstancesPromise = BookInstance.find({book: req.params.id})
+        
+        let [book, bookInstances] = await Promise.all([bookPromise, bookInstancesPromise]);
+
+        if(book === null) {
+            let err = new Error('Book not found');
+            err.status = 404;
+            return next(err);
+        }
+
+        res.render('book_detail', {title: book.title, book, book_instances: bookInstances});
+    }
+    catch {
+        next(err);
+    }
 };
 
 // Display book create form on GET.
 book_create_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create GET');
 };
 
 // Handle book create on POST.
 book_create_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book create POST');
 };
 
 // Display book delete form on GET.
 book_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book delete GET');
 };
 
 // Handle book delete on POST.
 book_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book delete POST');
 };
 
 // Display book update form on GET.
 book_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book update GET');
 };
 
 // Handle book update on POST.
 book_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Book update POST');
 };
 
 module.exports = {
