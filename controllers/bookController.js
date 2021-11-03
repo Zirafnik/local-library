@@ -48,7 +48,7 @@ let book_detail = async function(req, res, next) {
 
         res.render('book_detail', {title: book.title, book, book_instances: bookInstances});
     }
-    catch {
+    catch(err) {
         next(err);
     }
 };
