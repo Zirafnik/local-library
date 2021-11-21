@@ -48,27 +48,26 @@ let genre_create_post = [
         //Extract validaton errors
         const errors = validationResult(req);
 
-        //create genre obj
-        let genre = new Genre({name: req.body.name});
-
         if(!errors.isEmpty()) {
             //Render form again with sanitizied values/errors
-            res.render('genre_form', {title: 'Create Genre', genre: genre, errors: errors.array()});
+            res.render('genre_form', {title: 'Create Genre', genre: req.body, errors: errors.array()});
             return;
         }
-
+        
         // Data from form is valid
         // Check if genre already exists
         Genre.findOne({name: req.body.name})
-            .then(foundGenre => {
-                if(foundGenre) {
-                    res.redirect(foundGenre.url);
-                } else {
-                    genre.save()
-                    .then(savedGenre => {
-                            //genre saved
-                            res.redirect(genre.url);
-                    })
+        .then(foundGenre => {
+            if(foundGenre) {
+                res.redirect(foundGenre.url);
+            } else {
+                //create genre obj
+                let genre = new Genre({name: req.body.name});
+                genre.save()
+                .then(savedGenre => {
+                    //genre saved
+                    res.redirect(genre.url);
+                })
                 }
             })
             .catch(err => next(err));
