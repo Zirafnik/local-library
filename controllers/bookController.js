@@ -134,11 +134,42 @@ let book_create_post = [
 ];
 
 // Display book delete form on GET.
-book_delete_get = function(req, res) {
+let book_delete_get = async function(req, res, next) {
+    let [book, bookinstances] = await Promise.all([
+        Book.findById(req.params.id).populate('author').populate('genre'),
+        BookInstance.find({book: req.params.id})
+    ]).catch(err => next(err));
+
+    console.log(book);
+    console.log(bookinstances);
+    if(book === null) {
+        res.redirect('/catalog/books');
+    }
+    
+    res.render('book_delete', {title: 'Delete Book', book, bookinstances});
 };
 
 // Handle book delete on POST.
-book_delete_post = function(req, res) {
+book_delete_post = async function(req, res) {
+    let [book, bookinstances] = await Promise.all([
+        Book.findById(req.body.id),
+        BookInstance.find({book: req.body.id})
+    ]).catch(err => next(err));
+
+    //if book still has copies tied to it -> render same as GET route
+    if(bookinstances.length > 0) {
+        res.render('book_delete', {title: 'Delete Book', book, bookinstances});
+        return;
+    }
+    //book has no copies
+    else {
+        //delete book and redirect to list of books
+        Book.findByIdAndRemove(req.body.id)
+            .then(val => {
+                res.redirect('/catalog/books');
+            })
+            .catch(err => next(err));
+    }
 };
 
 // Display book update form on GET.
