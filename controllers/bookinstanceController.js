@@ -99,14 +99,54 @@ let bookinstance_delete_post = function(req, res, next) {
 };
 
 // Display BookInstance update form on GET.
-bookinstance_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: BookInstance update GET');
+let bookinstance_update_get = async function(req, res, next) {
+    let [bookinstance, book_list] = await Promise.all([
+        BookInstance.findById(req.params.id),
+        Book.find()
+    ]).catch(err => next(err));
+
+    if(bookinstance === null) {
+        let err = new Error('Copy not found');
+        err.status = 404;
+        return next(err);
+    }
+
+    res.render('bookinstance_form', {title: 'Update Copy', bookinstance, book_list});
 };
 
 // Handle bookinstance update on POST.
-bookinstance_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: BookInstance update POST');
-};
+let bookinstance_update_post = [
+    //Validate and sanitize
+    body('book', 'Book must be specified').trim().isLength({min: 1}).escape(),
+    body('imprint', 'Imprint must be specified').trim().isLength({min: 1}).escape(),
+    body('status').escape(),
+    body('due_back', 'Invalid date').optional({checkFalsy: true}).isISO8601().toDate(),
+
+    //Process request
+    async (req, res, next) => {
+        const errors = validationResult(req);
+
+        let bookinstance = new BookInstance({
+            book: req.body.book,
+            imprint: req.body.imprint,
+            status: req.body.status,
+            due_back: req.body.due_back,
+            _id: req.params.id
+        });
+
+        if(!errors.isEmpty()) {
+            let book_list = await Book.find().catch(err => next(err));
+
+            res.render('bookinstance_form', {title: 'Update Copy', bookinstance, book_list, errors: errors.array()});
+        } else {
+            BookInstance.findByIdAndUpdate(req.params.id, bookinstance, {})
+                .then(thecopy => {
+                    res.redirect(thecopy.url);
+                })
+                .catch(err => next(err));
+        }
+    }
+];
 
 module.exports = {
     bookinstance_list,
