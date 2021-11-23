@@ -140,8 +140,6 @@ let book_delete_get = async function(req, res, next) {
         BookInstance.find({book: req.params.id})
     ]).catch(err => next(err));
 
-    console.log(book);
-    console.log(bookinstances);
     if(book === null) {
         res.redirect('/catalog/books');
     }
