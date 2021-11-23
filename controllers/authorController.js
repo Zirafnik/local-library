@@ -114,14 +114,51 @@ let author_delete_post = async function(req, res, next) {
 };
 
 // Display Author update form on GET.
-author_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Author update GET');
+let author_update_get = async function(req, res, next) {
+    let author = await Author.findById(req.params.id).catch(err => next(err));
+    
+    //if no such author
+    if(author === null) {
+        let err = new Error('Author not found');
+        err.status = 404;
+        return next(err);
+    }
+    
+    res.render('author_form', {title: 'Update Author', author});
 };
 
 // Handle Author update on POST.
-author_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Author update POST');
-};
+let author_update_post = [
+    //Validate and sanitize
+    body('first_name').trim().isLength({min: 1}).escape().withMessage('First name must be specified.').isAlphanumeric().withMessage('First name has non-alphanumeric characters.'),
+    body('family_name').trim().isLength({min: 1}).escape().withMessage('Family name must be specified.').isAlphanumeric().withMessage('Family name has non-alphanumeric characters.'),
+    body('date_of_birth', 'Invalid date of birth').optional({checkFalsy: true}).isISO8601().toDate(),
+    body('date_of_death', 'Invalid date of death').optional({checkFalsy: true}).isISO8601().toDate(),
+    
+    //Process request
+    async (req, res, next) => {
+        const errors = validationResult(req);
+
+        let author = new Author({
+            first_name: req.body.first_name,
+            family_name: req.body.family_name,
+            date_of_birth: req.body.date_of_birth ? req.body.date_of_birth : null,
+            date_of_death: req.body.date_of_death ? req.body.date_of_death : null,
+            _id: req.params.id
+        });
+
+        if(!errors.isEmpty()) {   
+            res.render('author_form', {title: 'Update Author', author, errors: errors.array()});
+            return;
+        } else {
+            Author.findByIdAndUpdate(req.params.id, author, {})
+                .then(theauthor => {
+                    res.redirect(theauthor.url);
+                })
+                .catch(err => next(err));
+        }
+    }
+];
 
 module.exports = {
     author_list,

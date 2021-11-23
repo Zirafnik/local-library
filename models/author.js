@@ -30,6 +30,18 @@ AuthorSchema.virtual('lifespan').get(function() {
     return lifetime_string;
   });
 
+AuthorSchema.virtual('date_of_birth_form').get(function(){
+  if(this.date_of_birth){
+    return this.date_of_birth.toISOString().split('T')[0];
+  }
+});
+
+AuthorSchema.virtual('date_of_death_form').get(function(){
+  if(this.date_of_death){
+    return this.date_of_death.toISOString().split('T')[0];
+  }
+});
+
 // Virtual for author's URL
 AuthorSchema
 .virtual('url')
