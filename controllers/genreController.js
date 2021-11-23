@@ -123,14 +123,40 @@ let genre_delete_post = async function(req, res) {
 };
 
 // Display Genre update form on GET.
-genre_update_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre update GET');
+let genre_update_get = async function(req, res, next) {
+    let genre = await Genre.findOne({name: req.params.id});
+
+    res.render('genre_form', {title: 'Update Genre', genre});
 };
 
 // Handle Genre update on POST.
-genre_update_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre update POST');
-};
+let genre_update_post = [
+    //Validate and sanitize
+    body('name', 'Genre name required').trim().isLength({min: 1}).escape(),
+
+    //Process request
+    async (req, res, next) => {
+        const errors = validationResult(req);
+
+        //query for genre to get id
+        let genreQ = await Genre.findOne({name: req.params.id});
+
+        let genre = new Genre({
+            name: req.body.name,
+            _id: genreQ._id
+        });
+
+        if(!errors.isEmpty()) {
+            res.render('genre_form', {title: 'Update Genre', genre, errors: errors.array()});
+        } else {
+            Genre.findByIdAndUpdate(genre._id, genre, {})
+                .then(thegenre => {
+                    res.redirect(`/catalog/genre/${genre.name}`);
+                })
+                .catch(err => next(err));
+        }
+    }
+];
 
 
 module.exports = {
