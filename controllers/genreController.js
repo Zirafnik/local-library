@@ -75,13 +75,51 @@ let genre_create_post = [
 ];
 
 // Display Genre delete form on GET.
-genre_delete_get = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre delete GET');
+let genre_delete_get = async function(req, res, next) {
+    //have to call promises one after another, because I use id when referencing genre in book (not name), but the params include the name
+    try{
+        let genre = await Genre.findOne({name: req.params.id});
+
+        //genre doesnt exist
+        if(genre === null) {
+            res.redirect('/catalog/genres');
+        }
+
+        let genre_books = await Book.find({genre: genre._id});
+    
+        res.render('genre_delete', {title: 'Delete Genre', genre, genre_books});
+    } catch(err) {
+        return next(err);
+    }
 };
 
 // Handle Genre delete on POST.
-genre_delete_post = function(req, res) {
-    res.send('NOT IMPLEMENTED: Genre delete POST');
+let genre_delete_post = async function(req, res) {
+    try{
+        let genre = await Genre.findOne({name: req.params.id});
+        
+        //genre doesnt exist
+        if(genre === null) {
+            res.redirect('/catalog/genres');
+        }
+
+        let genre_books = await Book.find({genre: genre._id});
+        
+        //if there are books still with this genre, same as GET req
+        if(genre_books.length) {
+            res.render('genre_delete', {title: 'Delete Genre', genre, genre_books});
+            return;
+        }
+        // delete genre
+        else {
+            Genre.findOneAndDelete({name: req.params.id})
+                .then(val => {
+                    res.redirect('/catalog/genres');
+                });
+        }
+    } catch(err) {
+        return next(err);
+    }
 };
 
 // Display Genre update form on GET.
