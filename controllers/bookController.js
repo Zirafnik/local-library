@@ -150,7 +150,7 @@ let book_delete_get = async function(req, res, next) {
 };
 
 // Handle book delete on POST.
-book_delete_post = async function(req, res) {
+let book_delete_post = async function(req, res) {
     let [book, bookinstances] = await Promise.all([
         Book.findById(req.body.id),
         BookInstance.find({book: req.body.id})
