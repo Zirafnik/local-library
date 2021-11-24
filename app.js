@@ -16,7 +16,8 @@ app.use(helmet());
 app.use(compression());
 
 let mongoose = require('mongoose');
-let mongoDB = 'mongodb+srv://david:librarypassword@local-library.ul20l.mongodb.net/local_library?retryWrites=true&w=majority';
+let dev_db_url = 'mongodb+srv://david:librarypassword@local-library.ul20l.mongodb.net/local_library?retryWrites=true&w=majority';
+let mongoDB = process.env.MONGODB_URI || dev_db_url;
 
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
 let db = mongoose.connection;
