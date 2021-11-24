@@ -3,12 +3,17 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const compression = require('compression');
+const helmet = require('helmet');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 let catalogRouter = require('./routes/catalog');
 
 var app = express();
+
+app.use(helmet());
+app.use(compression());
 
 let mongoose = require('mongoose');
 let mongoDB = 'mongodb+srv://david:librarypassword@local-library.ul20l.mongodb.net/local_library?retryWrites=true&w=majority';
