@@ -1,5 +1,5 @@
 # Local Library App
-This is an example app for a library. It stores: books, authors, genres and book copies. I designed the database schema and the objects have many relationships amongst them. The app supports all CRUD operations.
+This is an example app for a library. It stores: books, authors, genres and book copies. I designed the database schema and the objects have many relationships amongst them. The app supports all CRUD operations. I have also implemented proper checking and error handling, so you cannot delete data that is directly used by other objects, unless you delete them first.
 
 The database is hosted on Atlas (DaaS) and the backend code itself on Heroku.
 
