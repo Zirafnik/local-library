@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const dotenv = require('dotenv').config();
 const compression = require('compression');
 const helmet = require('helmet');
 
@@ -16,8 +17,7 @@ app.use(helmet());
 app.use(compression());
 
 let mongoose = require('mongoose');
-let dev_db_url = 'mongodb+srv://david:librarypassword@local-library.ul20l.mongodb.net/local_library?retryWrites=true&w=majority';
-let mongoDB = process.env.MONGODB_URI || dev_db_url;
+let mongoDB = process.env.MONGODB_URI || process.env.DB_DEV;
 
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
 let db = mongoose.connection;
